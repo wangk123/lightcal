@@ -11,7 +11,7 @@ struct RootTabView: View {
             ))
             .tabItem { Label("今日", systemImage: "sun.max.fill") }
 
-            Text("趋势页（Task 18）")
+            TrendsView(viewModel: TrendsViewModel(store: AppContainer.shared.store))
                 .tabItem { Label("趋势", systemImage: "chart.line.uptrend.xyaxis") }
 
             Text("我的页（Task 19）")
