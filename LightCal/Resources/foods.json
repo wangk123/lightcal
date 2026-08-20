@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "foods": [
+    {"name": "米饭", "aliases": ["白米饭", "大米饭"], "nutritionPer100g": {"kcal": 116, "protein": 2.6, "fat": 0.3, "carb": 25.9}, "defaultServingGrams": 200},
+    {"name": "鸡胸肉", "aliases": ["鸡胸"], "nutritionPer100g": {"kcal": 133, "protein": 24.6, "fat": 3.3, "carb": 0.6}, "defaultServingGrams": 100},
+    {"name": "鸡蛋", "aliases": ["鸡蛋"], "nutritionPer100g": {"kcal": 144, "protein": 13.3, "fat": 8.8, "carb": 2.8}, "defaultServingGrams": 50},
+    {"name": "牛奶", "aliases": ["纯牛奶", "鲜奶"], "nutritionPer100g": {"kcal": 65, "protein": 3.3, "fat": 3.6, "carb": 4.9}, "defaultServingGrams": 250},
+    {"name": "苹果", "aliases": [], "nutritionPer100g": {"kcal": 53, "protein": 0.4, "fat": 0.2, "carb": 13.7}, "defaultServingGrams": 200},
+    {"name": "香蕉", "aliases": [], "nutritionPer100g": {"kcal": 93, "protein": 1.4, "fat": 0.2, "carb": 22}, "defaultServingGrams": 120},
+    {"name": "西兰花", "aliases": ["绿菜花"], "nutritionPer100g": {"kcal": 36, "protein": 4.1, "fat": 0.6, "carb": 4.3}, "defaultServingGrams": 100},
+    {"name": "红薯", "aliases": ["地瓜", "番薯"], "nutritionPer100g": {"kcal": 86, "protein": 1.6, "fat": 0.1, "carb": 20.1}, "defaultServingGrams": 150},
+    {"name": "燕麦", "aliases": ["燕麦片"], "nutritionPer100g": {"kcal": 377, "protein": 15, "fat": 6.7, "carb": 66}, "defaultServingGrams": 40},
+    {"name": "全麦面包", "aliases": [], "nutritionPer100g": {"kcal": 246, "protein": 10.4, "fat": 3.4, "carb": 41}, "defaultServingGrams": 70},
+    {"name": "牛肉", "aliases": ["瘦牛肉", "牛瘦肉"], "nutritionPer100g": {"kcal": 106, "protein": 20.2, "fat": 2.3, "carb": 1.2}, "defaultServingGrams": 100},
+    {"name": "三文鱼", "aliases": ["鲑鱼"], "nutritionPer100g": {"kcal": 208, "protein": 20.4, "fat": 13.4, "carb": 0}, "defaultServingGrams": 100},
+    {"name": "豆腐", "aliases": ["北豆腐"], "nutritionPer100g": {"kcal": 84, "protein": 8.1, "fat": 4.2, "carb": 4.2}, "defaultServingGrams": 100},
+    {"name": "酸奶", "aliases": ["无糖酸奶"], "nutritionPer100g": {"kcal": 63, "protein": 3.5, "fat": 3.3, "carb": 4.7}, "defaultServingGrams": 100},
+    {"name": "花生", "aliases": ["花生米"], "nutritionPer100g": {"kcal": 567, "protein": 25.8, "fat": 49.2, "carb": 16.1}, "defaultServingGrams": 30},
+    {"name": "玉米", "aliases": ["煮玉米"], "nutritionPer100g": {"kcal": 112, "protein": 4, "fat": 1.2, "carb": 22.8}, "defaultServingGrams": 150}
+  ]
+}

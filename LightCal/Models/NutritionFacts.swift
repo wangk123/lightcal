@@ -8,6 +8,24 @@ struct NutritionFacts: Codable, Equatable, Sendable {
     var carb: Double = 0
     var extras: [String: Double] = [:]
 
+    init(kcal: Double = 0, protein: Double = 0, fat: Double = 0, carb: Double = 0, extras: [String: Double] = [:]) {
+        self.kcal = kcal
+        self.protein = protein
+        self.fat = fat
+        self.carb = carb
+        self.extras = extras
+    }
+
+    /// 自定义解码：JSON 允许省略 extras（内置食物库只存核心四项，spec 3.7）
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        kcal = try container.decodeIfPresent(Double.self, forKey: .kcal) ?? 0
+        protein = try container.decodeIfPresent(Double.self, forKey: .protein) ?? 0
+        fat = try container.decodeIfPresent(Double.self, forKey: .fat) ?? 0
+        carb = try container.decodeIfPresent(Double.self, forKey: .carb) ?? 0
+        extras = try container.decodeIfPresent([String: Double].self, forKey: .extras) ?? [:]
+    }
+
     static func + (lhs: NutritionFacts, rhs: NutritionFacts) -> NutritionFacts {
         NutritionFacts(
             kcal: lhs.kcal + rhs.kcal,
