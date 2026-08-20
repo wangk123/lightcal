@@ -14,7 +14,7 @@ struct RootTabView: View {
             TrendsView(viewModel: TrendsViewModel(store: AppContainer.shared.store))
                 .tabItem { Label("趋势", systemImage: "chart.line.uptrend.xyaxis") }
 
-            Text("我的页（Task 19）")
+            ProfileView()
                 .tabItem { Label("我的", systemImage: "person.crop.circle") }
         }
     }

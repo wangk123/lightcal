@@ -1,5 +1,9 @@
 import Foundation
 
+enum WeightUnit: String, CaseIterable {
+    case kg, jin
+}
+
 enum Formatting {
     static func kcalText(_ value: Double) -> String {
         "\(Int(value.rounded()))"
@@ -16,5 +20,12 @@ enum Formatting {
 
     static func mlText(_ value: Double) -> String {
         "\(Int(value.rounded()))"
+    }
+
+    static func weightText(kg: Double, unit: WeightUnit) -> String {
+        switch unit {
+        case .kg: "\(String(format: "%.1f", kg)) kg"
+        case .jin: "\(String(format: "%.1f", kg * 2)) 斤"
+        }
     }
 }

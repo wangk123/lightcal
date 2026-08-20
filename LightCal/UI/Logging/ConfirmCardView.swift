@@ -35,6 +35,22 @@ struct ConfirmCardView: View {
                                     .font(.caption)
                                     .foregroundStyle(DesignTokens.aiAmber)
                                     .accessibilityLabel("AI 估算")
+                                Button {
+                                    let grams = max(item.grams, 1)
+                                    try? AppContainer.shared.store.saveCustomFood(CustomFood(
+                                        name: item.name,
+                                        nutritionPer100g: NutritionFacts(
+                                            kcal: item.nutrition.kcal * 100 / grams,
+                                            protein: item.nutrition.protein * 100 / grams,
+                                            fat: item.nutrition.fat * 100 / grams,
+                                            carb: item.nutrition.carb * 100 / grams
+                                        )
+                                    ))
+                                } label: {
+                                    Image(systemName: "square.and.arrow.down")
+                                        .accessibilityLabel("存为我的食物")
+                                }
+                                .buttonStyle(.borderless)
                             }
                             Spacer()
                             TextField("克", value: $grams[index], format: .number)
