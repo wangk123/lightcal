@@ -15,9 +15,7 @@ struct AppRootView: View {
 
     var body: some View {
         if (try? container.store.profile()) != nil {
-            Text("主页占位（Task 16 替换为 RootTabView）")
-                .font(.title)
-                .foregroundStyle(DesignTokens.primary)
+            RootTabView()
         } else {
             OnboardingView(store: container.store)
         }
