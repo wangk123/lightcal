@@ -1,0 +1,66 @@
+name: LightCal
+options:
+  bundleIdPrefix: com.wangk123
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  LightCal:
+    type: application
+    platform: iOS
+    sources: [LightCal]
+    info:
+      path: LightCal/Info.plist
+      properties:
+        CFBundleDisplayName: 轻卡
+        UILaunchScreen: {}
+        NSHealthShareUsageDescription: 用于读取运动消耗与体重数据，计算每日能量收支
+        NSHealthUpdateUsageDescription: 用于把体重与饮水记录写回健康
+        NSCameraUsageDescription: 用于拍摄食物照片进行本地识别
+        NSPhotoLibraryUsageDescription: 用于选择食物照片进行本地识别
+        NSSpeechRecognitionUsageDescription: 用于将语音转文字后解析饮食记录
+        NSMicrophoneUsageDescription: 用于语音输入饮食记录
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wangk123.lightcal
+  LightCalTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [LightCalTests]
+    dependencies:
+      - target: LightCal
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+  LightCalUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [LightCalUITests]
+    dependencies:
+      - target: LightCal
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  LightCal:
+    build:
+      targets:
+        LightCal: all
+        LightCalTests: [test]
+        LightCalUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - LightCalTests
+        - LightCalUITests
