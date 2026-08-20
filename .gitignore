@@ -12,3 +12,6 @@ build/
 # Swift Package Manager
 .build/
 .swiftpm/
+
+# xcodegen 生成物（不入库，xcodegen generate 重建）
+LightCal.xcodeproj/
