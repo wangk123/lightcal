@@ -29,12 +29,12 @@ enum PortionDefaults {
 /// 三层兜底：内置库 → 自定义食物 → AI 估算（spec 4.3）
 final class NutritionCompletion: NutritionCompleting {
     private let database: FoodDatabase
-    private let customFoodLookup: @Sendable (String) -> FoodRecord?
+    private let customFoodLookup: @Sendable (String) async -> FoodRecord?
     private let estimator: @Sendable (String) async throws -> NutritionFacts  // 返回每 100g 营养
 
     init(
         database: FoodDatabase,
-        customFoodLookup: @escaping @Sendable (String) -> FoodRecord?,
+        customFoodLookup: @escaping @Sendable (String) async -> FoodRecord?,
         estimator: @escaping @Sendable (String) async throws -> NutritionFacts
     ) {
         self.database = database
@@ -47,7 +47,7 @@ final class NutritionCompletion: NutritionCompleting {
         for item in items {
             if let record = database.match(exact: item.name) {
                 result.append(make(item: item, record: record, source: .builtin))
-            } else if let record = customFoodLookup(item.name) {
+            } else if let record = await customFoodLookup(item.name) {
                 result.append(make(item: item, record: record, source: .custom))
             } else {
                 let grams = Self.grams(for: item, record: nil)
