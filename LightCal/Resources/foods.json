@@ -723,9 +723,7 @@
   },
   {
    "name": "鸡肉",
-   "aliases": [
-    "鸡胸"
-   ],
+   "aliases": [],
    "nutritionPer100g": {
     "kcal": 167,
     "protein": 19.4,
@@ -951,17 +949,6 @@
     "protein": 15.0,
     "fat": 22.0,
     "carb": 7.0
-   },
-   "defaultServingGrams": null
-  },
-  {
-   "name": "排骨",
-   "aliases": [],
-   "nutritionPer100g": {
-    "kcal": 321,
-    "protein": 22.0,
-    "fat": 25.0,
-    "carb": 0.0
    },
    "defaultServingGrams": null
   },
@@ -2460,6 +2447,144 @@
     "protein": 0.0,
     "fat": 0.0,
     "carb": 5.0
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "鸡胸肉",
+   "aliases": [
+    "鸡胸",
+    "鸡胸脯肉"
+   ],
+   "nutritionPer100g": {
+    "kcal": 133,
+    "protein": 19.4,
+    "fat": 5.0,
+    "carb": 2.5
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "鸡腿肉",
+   "aliases": [
+    "鸡腿",
+    "琵琶腿"
+   ],
+   "nutritionPer100g": {
+    "kcal": 181,
+    "protein": 16.0,
+    "fat": 13.0,
+    "carb": 0.0
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "鸡翅",
+   "aliases": [
+    "鸡翅中",
+    "鸡翅根"
+   ],
+   "nutritionPer100g": {
+    "kcal": 194,
+    "protein": 17.4,
+    "fat": 11.8,
+    "carb": 4.6
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "牛里脊",
+   "aliases": [
+    "牛柳"
+   ],
+   "nutritionPer100g": {
+    "kcal": 107,
+    "protein": 22.2,
+    "fat": 0.9,
+    "carb": 2.4
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "牛腩",
+   "aliases": [
+    "牛腩肉"
+   ],
+   "nutritionPer100g": {
+    "kcal": 332,
+    "protein": 17.1,
+    "fat": 29.3,
+    "carb": 0.0
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "肥牛卷",
+   "aliases": [
+    "肥牛",
+    "肥牛片"
+   ],
+   "nutritionPer100g": {
+    "kcal": 250,
+    "protein": 19.1,
+    "fat": 18.7,
+    "carb": 0.0
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "猪里脊",
+   "aliases": [
+    "猪柳"
+   ],
+   "nutritionPer100g": {
+    "kcal": 155,
+    "protein": 20.2,
+    "fat": 7.9,
+    "carb": 0.7
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "猪五花肉",
+   "aliases": [
+    "五花肉",
+    "五花"
+   ],
+   "nutritionPer100g": {
+    "kcal": 568,
+    "protein": 7.7,
+    "fat": 59.0,
+    "carb": 0.9
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "猪排骨",
+   "aliases": [
+    "排骨",
+    "肋排",
+    "小排"
+   ],
+   "nutritionPer100g": {
+    "kcal": 278,
+    "protein": 16.7,
+    "fat": 23.1,
+    "carb": 0.7
+   },
+   "defaultServingGrams": null
+  },
+  {
+   "name": "全麦面包",
+   "aliases": [
+    "全麦吐司",
+    "全麦土司"
+   ],
+   "nutritionPer100g": {
+    "kcal": 246,
+    "protein": 8.6,
+    "fat": 2.6,
+    "carb": 46.3
    },
    "defaultServingGrams": null
   }
