@@ -20,6 +20,11 @@ final class FormattingTests: XCTestCase {
     func testMlText() {
         XCTAssertEqual(Formatting.mlText(2100), "2100")
     }
+
+    func testTimeText() {
+        let date = Calendar.current.date(from: DateComponents(year: 2026, month: 8, day: 21, hour: 14, minute: 30))!
+        XCTAssertEqual(Formatting.timeText(date), "14:30")
+    }
 }
 
 final class MockPipeline: LoggingPipelining, @unchecked Sendable {
