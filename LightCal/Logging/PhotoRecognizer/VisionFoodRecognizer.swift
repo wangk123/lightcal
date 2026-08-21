@@ -47,11 +47,48 @@ final class VisionFoodRecognizer: FoodPhotoRecognizing, @unchecked Sendable {
         "soup": "汤", "stew": "炖菜", "curry": "咖喱", "hot pot": "火锅", "sauce": "酱料", "broth": "高汤",
         // 饮品
         "tea": "茶", "coffee": "咖啡", "juice": "果汁", "soda": "汽水", "beer": "啤酒", "wine": "葡萄酒",
-        "water": "水", "milk shake": "奶昔", "smoothie": "果昔"
+        "water": "水", "milk shake": "奶昔", "smoothie": "果昔", "espresso": "浓缩咖啡", "cappuccino": "卡布奇诺",
+        "latte": "拿铁", "eggnog": "蛋奶酒", "cider": "苹果酒",
+        // 更多主食与菜肴
+        "pasta": "意面", "carbonara": "培根蛋酱意面", "paella": "海鲜饭", "nachos": "玉米片", "lasagna": "千层面",
+        "ravioli": "意式饺子", "gnocchi": "意式团子", "couscous": "古斯米", "polenta": "玉米糊", "tortilla": "玉米饼",
+        "pita": "皮塔饼", "baguette": "法棍", "sourdough": "酸面包", "ciabatta": "恰巴塔", "quiche": "法式咸派",
+        "frittata": "意式烘蛋", "scone": "司康", "biscuit": "饼干", "cracker": "苏打饼干", "chips": "薯片",
+        "granola": "格兰诺拉", "muesli": "什锦麦片", "cheeseburger": "芝士汉堡", "club sandwich": "俱乐部三明治",
+        "wrap": "卷饼", "meatball": "肉丸", "ribs": "排骨", "burger": "汉堡", "tart": "挞", "pie": "派",
+        "brownie": "布朗尼", "pudding": "布丁", "gelato": "意式冰淇淋", "sorbet": "雪芭", "toffee": "太妃糖",
+        "marshmallow": "棉花糖", "buckwheat": "荞麦", "quinoa": "藜麦", "barley": "大麦", "millet": "小米",
+        // 更多肉禽
+        "duck": "鸭肉", "lamb": "羊肉", "veal": "小牛肉", "turkey": "火鸡", "goose": "鹅肉",
+        "salami": "萨拉米", "pepperoni": "意大利辣肠",
+        // 更多水产
+        "squid": "鱿鱼", "octopus": "章鱼", "clam": "蛤蜊", "oyster": "生蚝", "mussel": "青口",
+        "eel": "鳗鱼", "cod": "鳕鱼", "sardine": "沙丁鱼", "anchovy": "凤尾鱼", "mackerel": "鲭鱼", "trout": "鳟鱼",
+        // 更多蔬菜
+        "zucchini": "西葫芦", "celery": "芹菜", "leek": "韭菜", "eggplant": "茄子", "asparagus": "芦笋",
+        "pumpkin": "南瓜", "radish": "萝卜", "beet": "甜菜根", "seaweed": "海苔", "tempeh": "天贝", "artichoke": "洋蓟",
+        // 更多水果坚果
+        "plum": "李子", "apricot": "杏", "raisin": "葡萄干", "olive": "橄榄", "chestnut": "栗子",
+        "pistachio": "开心果", "cashew": "腰果", "macadamia": "夏威夷果", "date": "枣", "cranberry": "蔓越莓",
+        "raspberry": "覆盆子", "blackberry": "黑莓", "grapefruit": "柚子", "lime": "青柠", "tangerine": "橘子",
+        "papaya": "木瓜", "lychee": "荔枝", "durian": "榴莲", "dragonfruit": "火龙果", "persimmon": "柿子",
+        "guava": "番石榴", "passionfruit": "百香果", "starfruit": "杨桃", "jackfruit": "菠萝蜜"
     ]
 
     static func localizedName(_ identifier: String) -> String {
-        labelMap[identifier.lowercased()] ?? identifier
+        labelMap[Self.normalizedIdentifier(identifier)] ?? identifier
+    }
+
+    /// 归一化：小写 + 下划线转空格（分类器标签为 ImageNet 风格，如 computer_mouse / fried_rice）
+    static func normalizedIdentifier(_ identifier: String) -> String {
+        identifier.lowercased()
+            .replacingOccurrences(of: "_", with: " ")
+            .trimmingCharacters(in: .whitespaces)
+    }
+
+    /// 是否已知食物类别（非食物标签一律丢弃，防止通用分类器的电子/家居类别混入）
+    static func isFoodLabel(_ identifier: String) -> Bool {
+        labelMap[Self.normalizedIdentifier(identifier)] != nil
     }
 
     static func makeCGImage(_ data: Data) -> CGImage? {
@@ -68,7 +105,8 @@ final class VisionFoodRecognizer: FoodPhotoRecognizing, @unchecked Sendable {
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         try handler.perform([request])
         let observations = request.results ?? []
-        let top = observations
+        let foodOnly = observations.filter { Self.isFoodLabel($0.identifier) }
+        let top = foodOnly
             .sorted { $0.confidence > $1.confidence }
             .prefix(5)
         guard !top.isEmpty else { throw VisionFoodRecognizerError.noFoodDetected }
