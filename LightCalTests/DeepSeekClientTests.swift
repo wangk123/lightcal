@@ -129,4 +129,25 @@ final class DeepSeekClientTests: XCTestCase {
         let responseFormat = json?["response_format"] as? [String: String]
         XCTAssertEqual(responseFormat?["type"], "json_object")
     }
+
+    func testDecodesMlField() async throws {
+        let payload = """
+        {"choices":[{"message":{"content":"{\\"items\\":[{\\"name\\":\\"美式咖啡\\",\\"grams\\":null,\\"ml\\":500,\\"count\\":null,\\"unit\\":null,\\"meal\\":null}]}"}}]}
+        """
+        let session = MockURLSession { _ in (Data(payload.utf8), Self.httpResponse()) }
+        let client = DeepSeekClient(config: config, session: session)
+        let items = try await client.parse("美式咖啡500ml")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "美式咖啡")
+        XCTAssertEqual(items[0].ml, 500)
+    }
+
+    func testSystemPromptRequiresMlAndForbidsNumberUnitAsFood() throws {
+        let body = try DeepSeekClient.bodyPayload(text: "美式咖啡500ml", model: "deepseek-chat")
+        let json = try JSONSerialization.jsonObject(with: body) as? [String: Any]
+        let messages = json?["messages"] as? [[String: String]]
+        let system = messages?.first?["content"] ?? ""
+        XCTAssertTrue(system.contains("ml"), "system prompt 应包含 ml 字段规则")
+        XCTAssertTrue(system.contains("不是食物") || system.contains("单独成条"), "system prompt 应禁止数字+单位单独成条")
+    }
 }

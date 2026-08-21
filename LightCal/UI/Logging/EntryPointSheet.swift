@@ -107,7 +107,7 @@ struct EntryPointSheet: View {
 
     private var textEntry: some View {
         VStack(spacing: 12) {
-            TextField("例如：一碗米饭 100g鸡胸肉", text: $text, axis: .vertical)
+            TextField("例如：一碗米饭 100g鸡胸肉 美式咖啡500ml", text: $text, axis: .vertical)
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(2...4)
                 .accessibilityIdentifier("logTextField")

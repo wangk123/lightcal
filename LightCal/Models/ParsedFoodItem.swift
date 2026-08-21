@@ -25,6 +25,7 @@ struct ParsedFoodItem: Equatable, Codable, Sendable {
     var count: Double?   // 数量，如 "两个鸡蛋"
     var unit: String?    // 单位：个/只/碗/杯/瓶/盒/袋
     var meal: MealKind?
+    var ml: Double? = nil  // 显式体积（毫升），如 "美式咖啡500ml"；升自动 ×1000
 }
 
 /// 文本解析协议：DeepSeek 与本地正则兜底都实现它（spec 4.2）

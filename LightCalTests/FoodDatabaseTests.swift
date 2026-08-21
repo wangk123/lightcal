@@ -75,7 +75,41 @@ final class FoodDatabaseTests: XCTestCase {
 
     func testFoodCountAfterRefinement() throws {
         let db = try FoodDatabase.loadFromBundle()
-        XCTAssertEqual(db.foods.count, 232)
+        XCTAssertEqual(db.foods.count, 242)
+    }
+
+    func testDrinkEntriesMarkedLiquid() throws {
+        let db = try FoodDatabase.loadFromBundle()
+        for name in ["咖啡", "牛奶", "水", "美式咖啡", "黑咖啡", "豆浆", "奶茶"] {
+            guard let record = db.match(exact: name) else {
+                XCTFail("缺少饮品条目 \(name)")
+                continue
+            }
+            XCTAssertTrue(record.isDrink, "\(name) 应为饮品（liquid: true）")
+        }
+    }
+
+    func testNewDrinkAliases() throws {
+        let db = try FoodDatabase.loadFromBundle()
+        XCTAssertEqual(db.match(exact: "冰美式")?.name, "美式咖啡")
+        XCTAssertEqual(db.match(exact: "矿泉水")?.name, "水")
+        XCTAssertEqual(db.match(exact: "白开水")?.name, "水")
+        XCTAssertEqual(db.match(exact: "纯牛奶")?.name, "牛奶")
+        XCTAssertEqual(db.match(exact: "红茶")?.name, "茶")
+        XCTAssertEqual(db.match(exact: "可乐")?.name, "汽水")
+        XCTAssertEqual(db.match(exact: "橙汁")?.name, "果汁")
+        XCTAssertEqual(db.match(exact: "苏打水")?.name, "气泡水")
+    }
+
+    func testSolidFoodsNotMarkedLiquid() throws {
+        let db = try FoodDatabase.loadFromBundle()
+        for name in ["米饭", "鸡胸肉", "苹果"] {
+            guard let record = db.match(exact: name) else {
+                XCTFail("缺少条目 \(name)")
+                continue
+            }
+            XCTAssertFalse(record.isDrink, "\(name) 不应是饮品")
+        }
     }
 
     func testLoadFromBundleMissingResourceThrows() {

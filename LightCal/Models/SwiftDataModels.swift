@@ -61,15 +61,17 @@ final class FoodLogItem {
     var grams: Double
     var nutrition: NutritionFacts  // 快照冗余（spec 3.4）
     var source: String           // NutritionSource.rawValue
+    var volumeMl: Double?        // 饮品体积（ml），非 nil 时时间线以 ml 展示
     var createdAt: Date
 
-    init(date: Date, meal: String, name: String, grams: Double, nutrition: NutritionFacts, source: String) {
+    init(date: Date, meal: String, name: String, grams: Double, nutrition: NutritionFacts, source: String, volumeMl: Double? = nil) {
         self.date = date
         self.meal = meal
         self.name = name
         self.grams = grams
         self.nutrition = nutrition
         self.source = source
+        self.volumeMl = volumeMl
         self.createdAt = .now
     }
 }

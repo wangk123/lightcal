@@ -96,6 +96,19 @@ final class DataStoreTests: XCTestCase {
         XCTAssertTrue(try store.allPresetFoods().isEmpty)
     }
 
+    func testSaveLogItemsPersistsVolumeMl() throws {
+        let store = try makeStore()
+        let item = CompletedFoodItem(
+            name: "美式咖啡", grams: 500,
+            nutrition: NutritionFacts(kcal: 10, protein: 0.5, fat: 0, carb: 2),
+            source: .builtin, volumeMl: 500
+        )
+        try store.saveLogItems([item], date: day(), meal: .breakfast)
+        let items = try store.logItems(on: day())
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].volumeMl, 500)
+    }
+
     func testExportJSONRoundTrip() throws {
         let store = try makeStore()
         let item = CompletedFoodItem(name: "鸡蛋", grams: 100, nutrition: NutritionFacts(kcal: 144, protein: 13.3, fat: 8.8, carb: 2.8), source: .builtin)

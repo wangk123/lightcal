@@ -132,6 +132,21 @@ final class TodayViewModelTests: XCTestCase {
         XCTAssertEqual(foodEntry.icon, "fork.knife")
     }
 
+    func testTimelineDrinkEntryShowsMl() async throws {
+        let vm = try await makeViewModel()
+        let item = CompletedFoodItem(
+            name: "美式咖啡", grams: 500,
+            nutrition: NutritionFacts(kcal: 10, protein: 0.5, fat: 0, carb: 2),
+            source: .builtin, volumeMl: 500
+        )
+        vm.draft = LogDraft(items: [item], originalText: nil)
+        vm.saveDraft()
+        await vm.refresh()
+
+        guard let entry = vm.timeline.first, case .food = entry else { return XCTFail("第一条应为食物") }
+        XCTAssertEqual(entry.titleText, "美式咖啡 500ml")
+    }
+
     func testDeleteFoodAndWaterEntries() async throws {
         let vm = try await makeViewModel()
         let item = CompletedFoodItem(name: "鸡胸肉", grams: 100, nutrition: NutritionFacts(kcal: 133, protein: 24.6, fat: 3.3, carb: 0.6), source: .builtin)

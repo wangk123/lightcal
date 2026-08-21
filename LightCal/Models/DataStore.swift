@@ -79,7 +79,8 @@ final class DataStore {
                 name: item.name,
                 grams: item.grams,
                 nutrition: item.nutrition,
-                source: item.source.rawValue
+                source: item.source.rawValue,
+                volumeMl: item.volumeMl
             ))
         }
         try container.mainContext.save()
@@ -225,6 +226,7 @@ final class DataStore {
             let grams: Double
             let nutrition: NutritionFacts
             let source: String
+            let volumeMl: Double?
             let createdAt: Date
         }
 
@@ -267,7 +269,7 @@ final class DataStore {
             logItems: try context.fetch(FetchDescriptor<FoodLogItem>()).map {
                 ExportDTO.LogItemSnapshot(
                     date: $0.date, meal: $0.meal, name: $0.name, grams: $0.grams,
-                    nutrition: $0.nutrition, source: $0.source, createdAt: $0.createdAt
+                    nutrition: $0.nutrition, source: $0.source, volumeMl: $0.volumeMl, createdAt: $0.createdAt
                 )
             },
             waterItems: try context.fetch(FetchDescriptor<WaterLogItem>()).map {

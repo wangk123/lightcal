@@ -12,6 +12,8 @@ struct CompletedFoodItem: Equatable, Sendable {
     var grams: Double
     var nutrition: NutritionFacts
     var source: NutritionSource
+    /// 饮品体积（ml）：非 nil 时份量以 ml 展示/编辑（营养仍按 grams=1ml≈1g 计算）
+    var volumeMl: Double? = nil
 }
 
 protocol NutritionCompleting: Sendable {
@@ -57,7 +59,10 @@ final class NutritionCompletion: NutritionCompleting {
                 } else {
                     nutrition = NutritionFacts()  // 估算失败：零营养占位，UI 必须让用户补全
                 }
-                result.append(CompletedFoodItem(name: item.name, grams: grams, nutrition: nutrition, source: .aiEstimated))
+                result.append(CompletedFoodItem(
+                    name: item.name, grams: grams, nutrition: nutrition, source: .aiEstimated,
+                    volumeMl: Self.volumeMl(for: item, record: nil, grams: grams)
+                ))
             }
         }
         return result
@@ -69,13 +74,15 @@ final class NutritionCompletion: NutritionCompleting {
             name: item.name,
             grams: grams,
             nutrition: .scaled(record.nutritionPer100g, grams: grams),
-            source: source
+            source: source,
+            volumeMl: Self.volumeMl(for: item, record: record, grams: grams)
         )
     }
 
-    /// 份量换算优先级：显式克重 → 数量×每份克重 → 单位默认 → 食物默认份量 → 100g 兜底
+    /// 份量换算优先级：显式克重 → 显式毫升(1ml≈1g) → 数量×每份克重 → 单位默认 → 食物默认份量 → 100g 兜底
     static func grams(for item: ParsedFoodItem, record: FoodRecord?) -> Double {
         if let grams = item.grams { return grams }
+        if let ml = item.ml { return ml }
         if let count = item.count, let unit = item.unit {
             let perUnit = record?.defaultServingGrams ?? PortionDefaults.unitGrams[unit] ?? PortionDefaults.fallbackGrams
             return count * perUnit
@@ -84,5 +91,13 @@ final class NutritionCompletion: NutritionCompleting {
             return PortionDefaults.unitGrams[unit] ?? PortionDefaults.fallbackGrams
         }
         return record?.defaultServingGrams ?? PortionDefaults.fallbackGrams
+    }
+
+    /// 显示体积自适应：解析自带 ml → ml；用户明确给克 → g；饮品按容器单位/兜底份量 → ml；固体 → nil（g）
+    static func volumeMl(for item: ParsedFoodItem, record: FoodRecord?, grams: Double) -> Double? {
+        if let ml = item.ml { return ml }
+        if item.grams != nil { return nil }
+        if record?.isDrink == true { return grams }
+        return nil
     }
 }

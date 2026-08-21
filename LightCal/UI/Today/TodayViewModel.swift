@@ -178,11 +178,14 @@ enum TimelineEntry: Identifiable {
         }
     }
 
-    /// 主体文案：食物="鸡胸肉 100g"，饮水="250 ml"
+    /// 主体文案：食物="鸡胸肉 100g"（饮品="美式咖啡 500ml"），饮水="250 ml"
     var titleText: String {
         switch self {
-        case .food(let item): "\(item.name) \(Formatting.gramsText(item.grams))"
-        case .water(let item): "\(Formatting.mlText(item.amountMl)) ml"
+        case .food(let item):
+            if let ml = item.volumeMl { return "\(item.name) \(Formatting.mlText(ml))ml" }
+            return "\(item.name) \(Formatting.gramsText(item.grams))"
+        case .water(let item):
+            return "\(Formatting.mlText(item.amountMl)) ml"
         }
     }
 

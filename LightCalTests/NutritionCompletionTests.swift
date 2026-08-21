@@ -4,7 +4,8 @@ import XCTest
 final class NutritionCompletionTests: XCTestCase {
     private let database = FoodDatabase(foods: [
         FoodRecord(name: "鸡蛋", aliases: [], nutritionPer100g: NutritionFacts(kcal: 144, protein: 13.3, fat: 8.8, carb: 2.8), defaultServingGrams: 50),
-        FoodRecord(name: "米饭", aliases: ["白米饭"], nutritionPer100g: NutritionFacts(kcal: 116, protein: 2.6, fat: 0.3, carb: 25.9), defaultServingGrams: 200)
+        FoodRecord(name: "米饭", aliases: ["白米饭"], nutritionPer100g: NutritionFacts(kcal: 116, protein: 2.6, fat: 0.3, carb: 25.9), defaultServingGrams: 200),
+        FoodRecord(name: "牛奶", aliases: [], nutritionPer100g: NutritionFacts(kcal: 65, protein: 3.3, fat: 3.6, carb: 4.9), defaultServingGrams: 250, isLiquid: true)
     ])
 
     func testBuiltinMatchFirst() async {
@@ -70,5 +71,68 @@ final class NutritionCompletionTests: XCTestCase {
         XCTAssertEqual(NutritionCompletion.grams(for: ParsedFoodItem(name: "牛奶", grams: nil, count: nil, unit: "杯", meal: nil), record: nil), 250)
         // 无任何信息 → 兜底
         XCTAssertEqual(NutritionCompletion.grams(for: ParsedFoodItem(name: "x", grams: nil, count: nil, unit: nil, meal: nil), record: nil), PortionDefaults.fallbackGrams)
+        // 毫升按 1ml≈1g 换算
+        XCTAssertEqual(NutritionCompletion.grams(for: ParsedFoodItem(name: "牛奶", grams: nil, count: nil, unit: nil, meal: nil, ml: 500), record: nil), 500)
+    }
+
+    // MARK: - 饮品单位自适应（液体用 ml，固体用 g）
+
+    func testParsedMlOnDrinkKeepsMlAndScalesNutrition() async {
+        let completion = NutritionCompletion(
+            database: database,
+            customFoodLookup: { _ in nil },
+            estimator: { _ in throw DeepSeekError.decodingFailed }
+        )
+        let items = await completion.complete([ParsedFoodItem(name: "牛奶", grams: nil, count: nil, unit: nil, meal: nil, ml: 500)])
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].grams, 500)
+        XCTAssertEqual(items[0].volumeMl, 500)
+        XCTAssertEqual(items[0].nutrition.kcal, 325, accuracy: 0.001)  // 65 × 5
+        XCTAssertEqual(items[0].source, .builtin)
+    }
+
+    func testDrinkWithCupUnitShowsMl() async {
+        let completion = NutritionCompletion(
+            database: database,
+            customFoodLookup: { _ in nil },
+            estimator: { _ in throw DeepSeekError.decodingFailed }
+        )
+        let items = await completion.complete([ParsedFoodItem(name: "牛奶", grams: nil, count: 1, unit: "杯", meal: nil)])
+        XCTAssertEqual(items[0].grams, 250)
+        XCTAssertEqual(items[0].volumeMl, 250)
+    }
+
+    func testSolidFoodStaysGrams() async {
+        let completion = NutritionCompletion(
+            database: database,
+            customFoodLookup: { _ in nil },
+            estimator: { _ in throw DeepSeekError.decodingFailed }
+        )
+        let items = await completion.complete([ParsedFoodItem(name: "米饭", grams: nil, count: 1, unit: "碗", meal: nil)])
+        XCTAssertEqual(items[0].grams, 200)
+        XCTAssertNil(items[0].volumeMl)
+    }
+
+    func testExplicitGramsOnDrinkShowsGrams() async {
+        let completion = NutritionCompletion(
+            database: database,
+            customFoodLookup: { _ in nil },
+            estimator: { _ in throw DeepSeekError.decodingFailed }
+        )
+        let items = await completion.complete([ParsedFoodItem(name: "牛奶", grams: 300, count: nil, unit: nil, meal: nil)])
+        XCTAssertEqual(items[0].grams, 300)
+        XCTAssertNil(items[0].volumeMl)  // 用户明确说克 → 显示 g
+    }
+
+    func testParsedMlOnUnknownFoodStillShowsMl() async {
+        let completion = NutritionCompletion(
+            database: database,
+            customFoodLookup: { _ in nil },
+            estimator: { _ in throw DeepSeekError.decodingFailed }
+        )
+        let items = await completion.complete([ParsedFoodItem(name: "柠檬水", grams: nil, count: nil, unit: nil, meal: nil, ml: 300)])
+        XCTAssertEqual(items[0].grams, 300)
+        XCTAssertEqual(items[0].volumeMl, 300)
+        XCTAssertEqual(items[0].source, .aiEstimated)
     }
 }

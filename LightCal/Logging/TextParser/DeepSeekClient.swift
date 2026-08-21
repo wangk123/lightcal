@@ -52,9 +52,12 @@ final class DeepSeekClient: FoodTextParsing, Sendable {
     static func bodyPayload(text: String, model: String) throws -> Data {
         let systemPrompt = """
         你是食物解析器。把用户描述的饮食拆成条目，只输出 JSON，不要输出其他内容。
-        规则：食物名用中文；份量尽量换算成克（g）；无法确定克重时给出 count（数量）与 unit（个/碗/杯/瓶/盒/袋）；
+        规则：食物名用中文；固体食物份量换算成克（g）放在 grams；
+        液体饮品（咖啡、牛奶、水、果汁、茶、汤等）的毫升数放在 ml；
+        数字+单位（如 500ml、100g、两个）不是食物，必须并入它修饰的食物条目，绝不单独成条；
+        无法确定克重或毫升时给出 count（数量）与 unit（个/碗/杯/瓶/盒/袋）；
         识别餐次（早餐/午餐/晚餐/加餐），无餐次信息则为 null。
-        输出格式：{"items":[{"name":"鸡胸肉","grams":100,"count":null,"unit":null,"meal":"午餐"}]}
+        输出格式：{"items":[{"name":"鸡胸肉","grams":100,"ml":null,"count":null,"unit":null,"meal":"午餐"}]}
         """
         struct Payload: Encodable {
             let model: String
@@ -83,6 +86,7 @@ final class DeepSeekClient: FoodTextParsing, Sendable {
             struct ItemDTO: Decodable {
                 let name: String
                 let grams: Double?
+                let ml: Double?
                 let count: Double?
                 let unit: String?
                 let meal: String?
@@ -99,7 +103,8 @@ final class DeepSeekClient: FoodTextParsing, Sendable {
                     grams: $0.grams,
                     count: $0.count,
                     unit: $0.unit,
-                    meal: $0.meal.flatMap { MealKind(rawValue: $0) }
+                    meal: $0.meal.flatMap { MealKind(rawValue: $0) },
+                    ml: $0.ml
                 )
             }
         } catch let error as DeepSeekError {

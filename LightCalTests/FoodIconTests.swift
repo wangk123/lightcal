@@ -74,4 +74,17 @@ final class FoodIconTests: XCTestCase {
     func testWaterExactName() {
         XCTAssertEqual(FoodIcon.symbol(for: "水"), "drop.fill")
     }
+
+    func testNewDrinkSymbols() {
+        XCTAssertEqual(FoodIcon.symbol(for: "美式咖啡"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "黑咖啡"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "豆浆"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "奶茶"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "柠檬水"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "气泡水"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "椰子水"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "椰奶"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "奶昔"), "wineglass.fill")
+        XCTAssertEqual(FoodIcon.symbol(for: "果昔"), "wineglass.fill")
+    }
 }

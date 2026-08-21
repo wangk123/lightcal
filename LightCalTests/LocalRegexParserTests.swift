@@ -44,4 +44,75 @@ final class LocalRegexParserTests: XCTestCase {
         XCTAssertEqual(LocalRegexParser.parseCount("10"), 10)
         XCTAssertNil(LocalRegexParser.parseCount("百"))
     }
+
+    // MARK: - 体积单位（ml/毫升/升）支持
+
+    func testVolumeMlNameFirst() async throws {
+        let items = try await LocalRegexParser().parse("美式咖啡500ml")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "美式咖啡")
+        XCTAssertEqual(items[0].ml, 500)
+        XCTAssertNil(items[0].grams)
+    }
+
+    func testVolumeMlAmountFirstWithSpace() async throws {
+        let items = try await LocalRegexParser().parse("500ml 牛奶")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "牛奶")
+        XCTAssertEqual(items[0].ml, 500)
+    }
+
+    func testVolumeMlNameFirstWithSpaceDoesNotSplit() async throws {
+        let items = try await LocalRegexParser().parse("美式咖啡 500ml")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "美式咖啡")
+        XCTAssertEqual(items[0].ml, 500)
+    }
+
+    func testLitersConvertedToMl() async throws {
+        let items = try await LocalRegexParser().parse("2升牛奶")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "牛奶")
+        XCTAssertEqual(items[0].ml, 2000)
+    }
+
+    func testChineseNumeralVolume() async throws {
+        let items = try await LocalRegexParser().parse("五百毫升牛奶")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "牛奶")
+        XCTAssertEqual(items[0].ml, 500)
+    }
+
+    func testNameFirstGrams() async throws {
+        let items = try await LocalRegexParser().parse("鸡胸肉100g")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "鸡胸肉")
+        XCTAssertEqual(items[0].grams, 100)
+    }
+
+    func testChineseMultiCharCount() async throws {
+        let items = try await LocalRegexParser().parse("二十个饺子")
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].name, "饺子")
+        XCTAssertEqual(items[0].count, 20)
+        XCTAssertEqual(items[0].unit, "个")
+    }
+
+    func testBareNumberUnitIsNotFood() async throws {
+        let mlOnly = try await LocalRegexParser().parse("500ml")
+        XCTAssertTrue(mlOnly.isEmpty)
+        let gOnly = try await LocalRegexParser().parse("100g")
+        XCTAssertTrue(gOnly.isEmpty)
+        let chineseMlOnly = try await LocalRegexParser().parse("五百毫升")
+        XCTAssertTrue(chineseMlOnly.isEmpty)
+    }
+
+    func testMultipleVolumeItems() async throws {
+        let items = try await LocalRegexParser().parse("美式咖啡500ml和牛奶200ml")
+        XCTAssertEqual(items.count, 2)
+        XCTAssertEqual(items[0].name, "美式咖啡")
+        XCTAssertEqual(items[0].ml, 500)
+        XCTAssertEqual(items[1].name, "牛奶")
+        XCTAssertEqual(items[1].ml, 200)
+    }
 }

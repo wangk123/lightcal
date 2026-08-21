@@ -1218,14 +1218,18 @@
   },
   {
    "name": "牛奶",
-   "aliases": [],
+   "aliases": [
+    "纯牛奶",
+    "全脂牛奶"
+   ],
    "nutritionPer100g": {
     "kcal": 65,
     "protein": 3.3,
     "fat": 3.6,
     "carb": 4.9
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "酸奶",
@@ -1280,7 +1284,8 @@
     "fat": 4.2,
     "carb": 8.1
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "西兰花",
@@ -2250,7 +2255,8 @@
     "fat": 1.0,
     "carb": 6.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "炖菜",
@@ -2305,18 +2311,25 @@
     "fat": 0.5,
     "carb": 2.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "茶",
-   "aliases": [],
+   "aliases": [
+    "红茶",
+    "绿茶",
+    "乌龙茶",
+    "花茶"
+   ],
    "nutritionPer100g": {
     "kcal": 1,
     "protein": 0.0,
     "fat": 0.0,
     "carb": 0.2
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "咖啡",
@@ -2327,29 +2340,38 @@
     "fat": 0.0,
     "carb": 0.3
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "果汁",
-   "aliases": [],
+   "aliases": [
+    "橙汁",
+    "苹果汁"
+   ],
    "nutritionPer100g": {
     "kcal": 45,
     "protein": 0.3,
     "fat": 0.1,
     "carb": 10.8
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "汽水",
-   "aliases": [],
+   "aliases": [
+    "可乐",
+    "雪碧"
+   ],
    "nutritionPer100g": {
     "kcal": 41,
     "protein": 0.0,
     "fat": 0.0,
     "carb": 10.6
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "啤酒",
@@ -2360,7 +2382,8 @@
     "fat": 0.0,
     "carb": 3.6
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "葡萄酒",
@@ -2371,18 +2394,25 @@
     "fat": 0.0,
     "carb": 2.6
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "水",
-   "aliases": [],
+   "aliases": [
+    "白开水",
+    "矿泉水",
+    "凉白开",
+    "饮用水"
+   ],
    "nutritionPer100g": {
     "kcal": 0,
     "protein": 0.0,
     "fat": 0.0,
     "carb": 0.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "奶昔",
@@ -2393,7 +2423,8 @@
     "fat": 3.5,
     "carb": 17.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "果昔",
@@ -2404,7 +2435,8 @@
     "fat": 0.5,
     "carb": 13.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "浓缩咖啡",
@@ -2415,7 +2447,8 @@
     "fat": 0.2,
     "carb": 1.7
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "卡布奇诺",
@@ -2426,7 +2459,8 @@
     "fat": 2.0,
     "carb": 4.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "拿铁",
@@ -2437,7 +2471,8 @@
     "fat": 2.5,
     "carb": 4.5
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "苹果酒",
@@ -2448,7 +2483,8 @@
     "fat": 0.0,
     "carb": 5.0
    },
-   "defaultServingGrams": null
+   "defaultServingGrams": null,
+   "isLiquid": true
   },
   {
    "name": "鸡胸肉",
@@ -2587,6 +2623,142 @@
     "carb": 46.3
    },
    "defaultServingGrams": null
+  },
+  {
+   "name": "美式咖啡",
+   "aliases": [
+    "美式",
+    "冰美式",
+    "热美式"
+   ],
+   "nutritionPer100g": {
+    "kcal": 2.0,
+    "protein": 0.1,
+    "fat": 0.0,
+    "carb": 0.4
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "黑咖啡",
+   "aliases": [
+    "清咖"
+   ],
+   "nutritionPer100g": {
+    "kcal": 1.0,
+    "protein": 0.1,
+    "fat": 0.0,
+    "carb": 0.2
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "豆浆",
+   "aliases": [
+    "豆奶"
+   ],
+   "nutritionPer100g": {
+    "kcal": 31.0,
+    "protein": 3.0,
+    "fat": 1.6,
+    "carb": 1.2
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "奶茶",
+   "aliases": [
+    "珍珠奶茶"
+   ],
+   "nutritionPer100g": {
+    "kcal": 60.0,
+    "protein": 1.0,
+    "fat": 2.0,
+    "carb": 9.0
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "柠檬水",
+   "aliases": [],
+   "nutritionPer100g": {
+    "kcal": 10.0,
+    "protein": 0.1,
+    "fat": 0.0,
+    "carb": 2.5
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "气泡水",
+   "aliases": [
+    "苏打水"
+   ],
+   "nutritionPer100g": {
+    "kcal": 0.0,
+    "protein": 0.0,
+    "fat": 0.0,
+    "carb": 0.0
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "脱脂牛奶",
+   "aliases": [
+    "脱脂奶"
+   ],
+   "nutritionPer100g": {
+    "kcal": 34.0,
+    "protein": 3.4,
+    "fat": 0.1,
+    "carb": 5.0
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "低脂牛奶",
+   "aliases": [
+    "低脂奶"
+   ],
+   "nutritionPer100g": {
+    "kcal": 45.0,
+    "protein": 3.4,
+    "fat": 1.5,
+    "carb": 5.0
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "椰奶",
+   "aliases": [],
+   "nutritionPer100g": {
+    "kcal": 230.0,
+    "protein": 2.3,
+    "fat": 24.0,
+    "carb": 5.5
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
+  },
+  {
+   "name": "椰子水",
+   "aliases": [],
+   "nutritionPer100g": {
+    "kcal": 19.0,
+    "protein": 0.7,
+    "fat": 0.2,
+    "carb": 3.7
+   },
+   "defaultServingGrams": null,
+   "isLiquid": true
   }
  ]
 }

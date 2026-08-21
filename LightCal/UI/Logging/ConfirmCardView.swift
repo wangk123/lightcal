@@ -77,11 +77,11 @@ struct ConfirmCardView: View {
                         }
                         Spacer()
                         HStack(spacing: 2) {
-                            TextField("克", value: $grams[index], format: .number)
+                            TextField(item.volumeMl != nil ? "毫升" : "克", value: $grams[index], format: .number)
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .frame(width: 60)
-                            Text("g")
+                            Text(item.volumeMl != nil ? "ml" : "g")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -135,7 +135,10 @@ struct ConfirmCardView: View {
             nutrition.fat *= factor
             nutrition.carb *= factor
             nutrition.extras = nutrition.extras.mapValues { $0 * factor }
-            return CompletedFoodItem(name: item.name, grams: newGrams, nutrition: nutrition, source: item.source)
+            return CompletedFoodItem(
+                name: item.name, grams: newGrams, nutrition: nutrition, source: item.source,
+                volumeMl: item.volumeMl != nil ? newGrams : nil
+            )
         }
     }
 }
