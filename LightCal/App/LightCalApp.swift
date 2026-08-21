@@ -6,6 +6,7 @@ struct LightCalApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
+                .modelContainer(AppContainer.shared.store.container)
         }
     }
 }
@@ -22,6 +23,5 @@ struct AppRootView: View {
                 RootTabView()
             }
         }
-        .modelContainer(AppContainer.shared.store.container)
     }
 }

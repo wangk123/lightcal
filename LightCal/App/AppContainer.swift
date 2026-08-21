@@ -53,9 +53,12 @@ final class AppContainer {
     static func bootstrap() -> AppContainer {
         let database = (try? FoodDatabase.loadFromBundle()) ?? FoodDatabase(foods: [])
         let store: DataStore
-        if ProcessInfo.processInfo.arguments.contains("--uitest") {
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("--uitest") {
             store = (try? DataStore.makeInMemory()) ?? (try! DataStore.makeOnDisk())
             seedForUITest(store: store)
+        } else if arguments.contains("--uitest-fresh") {
+            store = (try? DataStore.makeInMemory()) ?? (try! DataStore.makeOnDisk())  // 空库：从建档流程开始
         } else {
             store = (try? DataStore.makeOnDisk()) ?? (try! DataStore.makeInMemory())
         }
