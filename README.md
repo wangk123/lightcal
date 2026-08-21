@@ -4,13 +4,14 @@
 
 - **平台**：iOS 17+ 原生（SwiftUI），仅个人自用
 - **隐私**：数据仅存本机，照片不出设备，媒体即用即弃
-- **状态**：v1 实现完成（92 单元测试 + UI 冒烟全绿），待真机手工验证
+- **状态**：v1 实现完成 + 今日记录增强（饮水时间线、左滑删除、肉类细分食物库、图标完善），全量单测 + UI 测试全绿，待真机手工验证
 
 ## 文档
 
 - 设计文档：[docs/superpowers/specs/2026-08-20-diet-tracker-design.md](docs/superpowers/specs/2026-08-20-diet-tracker-design.md)
 - 实现计划：[docs/superpowers/plans/2026-08-20-lightcal-implementation.md](docs/superpowers/plans/2026-08-20-lightcal-implementation.md)
 - 安装指南：[docs/INSTALL.md](docs/INSTALL.md)
+- 今日记录增强设计：[docs/superpowers/specs/2026-08-21-today-log-improvements-design.md](docs/superpowers/specs/2026-08-21-today-log-improvements-design.md)
 
 ## 构建与测试
 
