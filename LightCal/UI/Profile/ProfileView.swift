@@ -29,6 +29,7 @@ struct ProfileView: View {
             List {
                 goalSection
                 weightSection
+                presetFoodSection
                 customFoodSection
                 settingsSection
                 privacySection
@@ -82,6 +83,14 @@ struct ProfileView: View {
         Section {
             NavigationLink("自定义食物") {
                 CustomFoodsView(store: store)
+            }
+        }
+    }
+
+    private var presetFoodSection: some View {
+        Section {
+            NavigationLink("预设食物（缺口建议只推荐手边常备）") {
+                PresetFoodsView(store: store, database: AppContainer.shared.database)
             }
         }
     }

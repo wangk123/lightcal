@@ -67,6 +67,16 @@ final class DataStoreTests: XCTestCase {
         XCTAssertEqual(samples[2].weightKg, 70)
     }
 
+    func testPresetFoodCRUD() throws {
+        let store = try makeStore()
+        let preset = PresetFood(name: "鸡蛋", nutritionPer100g: NutritionFacts(kcal: 144, protein: 13.3, fat: 8.8, carb: 2.8))
+        try store.savePresetFood(preset)
+        XCTAssertEqual(try store.allPresetFoods().count, 1)
+        XCTAssertEqual(try store.allPresetFoods().first?.name, "鸡蛋")
+        try store.deletePresetFood(preset)
+        XCTAssertTrue(try store.allPresetFoods().isEmpty)
+    }
+
     func testExportJSONRoundTrip() throws {
         let store = try makeStore()
         let item = CompletedFoodItem(name: "鸡蛋", grams: 100, nutrition: NutritionFacts(kcal: 144, protein: 13.3, fat: 8.8, carb: 2.8), source: .builtin)

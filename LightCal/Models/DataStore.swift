@@ -17,7 +17,7 @@ final class DataStore {
     static func makeInMemory() throws -> DataStore {
         let schema = Schema([
             UserProfile.self, Goal.self, CustomFood.self,
-            FoodLogItem.self, WaterLogItem.self, WeightRecord.self
+            FoodLogItem.self, WaterLogItem.self, WeightRecord.self, PresetFood.self
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return DataStore(container: try ModelContainer(for: schema, configurations: [config]))
@@ -26,7 +26,7 @@ final class DataStore {
     static func makeOnDisk() throws -> DataStore {
         let schema = Schema([
             UserProfile.self, Goal.self, CustomFood.self,
-            FoodLogItem.self, WaterLogItem.self, WeightRecord.self
+            FoodLogItem.self, WaterLogItem.self, WeightRecord.self, PresetFood.self
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         return DataStore(container: try ModelContainer(for: schema, configurations: [config]))
@@ -153,6 +153,22 @@ final class DataStore {
         return records.prefix(limit).map { WeightSample(date: $0.date, weightKg: $0.weightKg) }
     }
 
+    // MARK: - 预设食物（缺口建议只在此范围内推荐）
+
+    func savePresetFood(_ food: PresetFood) throws {
+        container.mainContext.insert(food)
+        try container.mainContext.save()
+    }
+
+    func allPresetFoods() throws -> [PresetFood] {
+        try container.mainContext.fetch(FetchDescriptor<PresetFood>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)]))
+    }
+
+    func deletePresetFood(_ food: PresetFood) throws {
+        container.mainContext.delete(food)
+        try container.mainContext.save()
+    }
+
     // MARK: - 导出
 
     /// 导出快照：纯值 Codable 结构（@Model 类不自动获得 Codable 合成，导出格式与 SwiftData 内部解耦）
@@ -161,6 +177,7 @@ final class DataStore {
         let profile: ProfileSnapshot?
         let goals: [GoalSnapshot]
         let customFoods: [CustomFoodSnapshot]
+        let presetFoods: [PresetFoodSnapshot]
         let logItems: [LogItemSnapshot]
         let waterItems: [WaterSnapshot]
         let weightRecords: [WeightSnapshot]
@@ -184,6 +201,12 @@ final class DataStore {
         }
 
         struct CustomFoodSnapshot: Codable {
+            let name: String
+            let nutritionPer100g: NutritionFacts
+            let createdAt: Date
+        }
+
+        struct PresetFoodSnapshot: Codable {
             let name: String
             let nutritionPer100g: NutritionFacts
             let createdAt: Date
@@ -231,6 +254,9 @@ final class DataStore {
             },
             customFoods: try context.fetch(FetchDescriptor<CustomFood>()).map {
                 ExportDTO.CustomFoodSnapshot(name: $0.name, nutritionPer100g: $0.nutritionPer100g, createdAt: $0.createdAt)
+            },
+            presetFoods: try context.fetch(FetchDescriptor<PresetFood>()).map {
+                ExportDTO.PresetFoodSnapshot(name: $0.name, nutritionPer100g: $0.nutritionPer100g, createdAt: $0.createdAt)
             },
             logItems: try context.fetch(FetchDescriptor<FoodLogItem>()).map {
                 ExportDTO.LogItemSnapshot(

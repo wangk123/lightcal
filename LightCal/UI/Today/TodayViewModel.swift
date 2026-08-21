@@ -17,6 +17,7 @@ final class TodayViewModel {
     private(set) var prediction: PredictionScenarios?
     private(set) var weightRate: Double?
     private(set) var energyRate: Double?
+    private(set) var hasPresets = false
 
     init(store: DataStore, database: FoodDatabase, healthKit: HealthKitServing, pipeline: LoggingPipelining) {
         self.store = store
@@ -47,11 +48,20 @@ final class TodayViewModel {
             fatGap: targets.fat - intake.fat
         )
 
-        // 建议清单：候选池 = 内置库 + 自定义食物（AI 估算不进池，spec 6.2）
-        var candidates = database.foods
-        if let custom = try? store.allCustomFoods() {
-            candidates += custom.map {
+        // 建议清单：候选池 = 预设食物（手边常备）；未设置预设时退化为内置库 + 自定义食物
+        var candidates: [FoodRecord] = []
+        let presets = (try? store.allPresetFoods()) ?? []
+        hasPresets = !presets.isEmpty
+        if hasPresets {
+            candidates = presets.map {
                 FoodRecord(name: $0.name, aliases: [], nutritionPer100g: $0.nutritionPer100g, defaultServingGrams: 100)
+            }
+        } else {
+            candidates = database.foods
+            if let custom = try? store.allCustomFoods() {
+                candidates += custom.map {
+                    FoodRecord(name: $0.name, aliases: [], nutritionPer100g: $0.nutritionPer100g, defaultServingGrams: 100)
+                }
             }
         }
         let eaten = Set((try? store.logItems(on: now).map(\.name)) ?? [])

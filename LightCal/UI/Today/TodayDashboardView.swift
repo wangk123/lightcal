@@ -109,6 +109,11 @@ struct TodayDashboardView: View {
                         Text("\(suggestion.name) \(Formatting.gramsText(suggestion.grams)) · \(Formatting.kcalText(suggestion.nutrition.kcal)) kcal")
                             .font(.callout)
                     }
+                    if !viewModel.hasPresets {
+                        Text("建议来源于全部食物库。去「我的 → 预设食物」设置手边常备食材，建议更贴合实际")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)

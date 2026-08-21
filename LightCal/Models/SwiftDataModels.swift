@@ -99,3 +99,17 @@ final class WeightRecord {
         self.createdAt = .now
     }
 }
+
+/// 预设食物：用户手边常备的食材/食物，缺口建议只在此范围内推荐
+@Model
+final class PresetFood {
+    var name: String
+    var nutritionPer100g: NutritionFacts
+    var createdAt: Date
+
+    init(name: String, nutritionPer100g: NutritionFacts) {
+        self.name = name
+        self.nutritionPer100g = nutritionPer100g
+        self.createdAt = .now
+    }
+}

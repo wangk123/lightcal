@@ -7,12 +7,14 @@ struct ConfirmCardView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var grams: [Double]   // 与 draft.items 平行的可编辑份量
+    @State private var selected: Set<Int>  // 勾选保存的食物（默认全选）
 
     init(draft: LogDraft, meal: Binding<MealKind>, onSave: @escaping ([CompletedFoodItem]) -> Void) {
         self.draft = draft
         self._meal = meal
         self.onSave = onSave
         self._grams = State(initialValue: draft.items.map(\.grams))
+        self._selected = State(initialValue: Set(draft.items.indices))
     }
 
     var body: some View {
@@ -26,13 +28,29 @@ struct ConfirmCardView: View {
                     }
                     .pickerStyle(.segmented)
                 }
-                Section("确认食物（可修改份量）") {
+                Section("确认食物（勾选要保存的，可修改份量）") {
                     ForEach(Array(draft.items.enumerated()), id: \.offset) { index, item in
                         HStack {
+                            Button {
+                                if selected.contains(index) {
+                                    selected.remove(index)
+                                } else {
+                                    selected.insert(index)
+                                }
+                            } label: {
+                                Image(systemName: selected.contains(index) ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundStyle(selected.contains(index) ? DesignTokens.accent : .secondary)
+                                    .accessibilityLabel(selected.contains(index) ? "已勾选" : "未勾选")
+                            }
+                            .buttonStyle(.borderless)
+                            .accessibilityIdentifier("selectItem\(index)")
                             Image(systemName: FoodIcon.symbol(for: item.name))
                                 .foregroundStyle(DesignTokens.primary)
-                                .frame(width: 28)
+                                .frame(width: 26)
                             Text(item.name)
+                                .strikethrough(!selected.contains(index))
+                                .foregroundStyle(selected.contains(index) ? .primary : .secondary)
                             if item.source == .aiEstimated {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.caption)
@@ -56,10 +74,15 @@ struct ConfirmCardView: View {
                                 .buttonStyle(.borderless)
                             }
                             Spacer()
-                            TextField("克", value: $grams[index], format: .number)
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
-                                .frame(width: 70)
+                            HStack(spacing: 2) {
+                                TextField("克", value: $grams[index], format: .number)
+                                    .keyboardType(.decimalPad)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(width: 60)
+                                Text("g")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                             VStack(alignment: .trailing, spacing: 2) {
                                 // 营养随份量实时换算（按每100g成分 × 当前克重）
                                 let factor = item.grams > 0 ? grams[index] / item.grams : 1
@@ -89,18 +112,21 @@ struct ConfirmCardView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") {
-                        onSave(Self.rescaledItems(draft.items, grams: grams))
+                        onSave(Self.rescaledItems(draft.items, grams: grams, selected: selected))
                     }
-                    .disabled(draft.items.isEmpty)
+                    .disabled(selected.isEmpty)
                     .accessibilityIdentifier("saveDraft")
                 }
             }
         }
     }
 
-    /// 份量修改后按比例重算营养快照（spec 4.4 可编辑）
-    static func rescaledItems(_ items: [CompletedFoodItem], grams: [Double]) -> [CompletedFoodItem] {
-        zip(items, grams).map { item, newGrams in
+    /// 份量修改后按比例重算营养快照，仅保留勾选条目（spec 4.4 可编辑/可选）
+    static func rescaledItems(_ items: [CompletedFoodItem], grams: [Double], selected: Set<Int>) -> [CompletedFoodItem] {
+        items.indices.compactMap { index in
+            guard selected.contains(index), index < grams.count else { return nil }
+            let item = items[index]
+            let newGrams = grams[index]
             let factor = item.grams > 0 ? newGrams / item.grams : 1
             var nutrition = item.nutrition
             nutrition.kcal *= factor

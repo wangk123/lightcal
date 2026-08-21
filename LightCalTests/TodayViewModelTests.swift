@@ -67,4 +67,22 @@ final class TodayViewModelTests: XCTestCase {
         XCTAssertFalse(vm.suggestions.isEmpty)
         XCTAssertEqual(vm.suggestions.first?.name, "鸡胸肉")
     }
+
+    func testSuggestionsConstrainedToPresetFoods() async throws {
+        // 设置预设后：建议只来自预设（牛奶），不再推荐内置库里的鸡胸肉
+        let store = try DataStore.makeInMemory()
+        let targets = DailyTargets(kcal: 1800, protein: 126, fat: 56, carb: 200)
+        try store.appendGoal(Goal(targetWeightKg: 65, startDate: .now, startWeightKg: 70, targets: targets, systemTargets: targets, waterTargetMl: 2100))
+        try store.savePresetFood(PresetFood(name: "牛奶", nutritionPer100g: NutritionFacts(kcal: 65, protein: 3.3, fat: 3.6, carb: 4.9)))
+        let database = FoodDatabase(foods: [FoodRecord(name: "鸡胸肉", aliases: [], nutritionPer100g: NutritionFacts(kcal: 133, protein: 24.6, fat: 3.3, carb: 0.6), defaultServingGrams: 100)])
+        let vm = TodayViewModel(store: store, database: database, healthKit: MockHealthKit(), pipeline: MockPipeline())
+        // 造成蛋白缺口
+        let item = CompletedFoodItem(name: "米饭", grams: 300, nutrition: NutritionFacts(kcal: 348, protein: 7.8, fat: 0.9, carb: 77.7), source: .builtin)
+        vm.draft = LogDraft(items: [item], originalText: nil)
+        vm.saveDraft()
+        await vm.refresh()
+        XCTAssertTrue(vm.hasPresets)
+        XCTAssertFalse(vm.suggestions.isEmpty)
+        XCTAssertTrue(vm.suggestions.allSatisfy { $0.name == "牛奶" })
+    }
 }
