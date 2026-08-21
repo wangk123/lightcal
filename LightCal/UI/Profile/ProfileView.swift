@@ -15,6 +15,7 @@ struct ProfileView: View {
     @State private var newWeight: Double?
     @State private var currentGoal: Goal?
     @State private var latestWeight: Double?
+    @State private var authMessage: String?
 
     private let store = AppContainer.shared.store
     private let healthKit = AppContainer.shared.healthKit
@@ -93,7 +94,19 @@ struct ProfileView: View {
                     .accessibilityIdentifier("apiKeyField")
             }
             Button("请求 HealthKit 授权") {
-                Task { try? await healthKit.requestAuthorization() }
+                Task {
+                    do {
+                        try await healthKit.requestAuthorization()
+                        authMessage = "✅ 授权流程完成（可在系统健康中调整）"
+                    } catch {
+                        authMessage = "授权失败：\(error.localizedDescription)"
+                    }
+                }
+            }
+            if let authMessage {
+                Text(authMessage)
+                    .font(.footnote)
+                    .foregroundStyle(authMessage.hasPrefix("✅") ? DesignTokens.accent : DesignTokens.destructive)
             }
             Toggle("写回 HealthKit（体重/饮水）", isOn: $writeBackToHealthKit)
             Picker("体重单位", selection: $weightUnitRaw) {

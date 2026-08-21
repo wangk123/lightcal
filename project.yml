@@ -30,6 +30,10 @@ targets:
         NSMicrophoneUsageDescription: 用于语音输入饮食记录
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
+    entitlements:
+      path: LightCal/LightCal.entitlements
+      properties:
+        com.apple.developer.healthkit: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wangk123.lightcal
