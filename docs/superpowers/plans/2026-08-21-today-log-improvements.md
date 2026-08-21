@@ -578,7 +578,7 @@ git commit -m "feat: 饮水记录支持删除并按时间排序（DataStore）"
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `xcodebuild test -project LightCal.xcodeproj -scheme LightCal -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:LightCalTests/TodayViewModelTests/FormattingTests`
+Run: `xcodebuild test -project LightCal.xcodeproj -scheme LightCal -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:LightCalTests/FormattingTests`
 Expected: FAIL——编译错误（`timeText` 不存在）。
 
 - [ ] **Step 3: 实现**
@@ -598,7 +598,7 @@ Expected: FAIL——编译错误（`timeText` 不存在）。
 
 - [ ] **Step 4: 运行确认通过**
 
-Run: `xcodebuild test -project LightCal.xcodeproj -scheme LightCal -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:LightCalTests/TodayViewModelTests/FormattingTests`
+Run: `xcodebuild test -project LightCal.xcodeproj -scheme LightCal -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:LightCalTests/FormattingTests`
 Expected: PASS。
 
 - [ ] **Step 5: Commit**
