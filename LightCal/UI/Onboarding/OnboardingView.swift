@@ -14,6 +14,7 @@ struct OnboardingView: View {
                         Text("女").tag(Sex.female)
                     }
                     DatePicker("出生日期", selection: $viewModel.birthDate, displayedComponents: .date)
+                        .environment(\.locale, Locale(identifier: "zh-Hans"))
                     HStack {
                         Text("身高 (cm)")
                         Spacer()

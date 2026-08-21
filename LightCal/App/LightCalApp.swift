@@ -11,13 +11,17 @@ struct LightCalApp: App {
 }
 
 struct AppRootView: View {
-    private let container = AppContainer.shared
+    // @Query 响应式查询：建档保存后 SwiftUI 自动重算，无需重启即可进入主页
+    @Query private var profiles: [UserProfile]
 
     var body: some View {
-        if (try? container.store.profile()) != nil {
-            RootTabView()
-        } else {
-            OnboardingView(store: container.store)
+        Group {
+            if profiles.isEmpty {
+                OnboardingView(store: AppContainer.shared.store)
+            } else {
+                RootTabView()
+            }
         }
+        .modelContainer(AppContainer.shared.store.container)
     }
 }

@@ -20,6 +20,7 @@ targets:
       path: LightCal/Info.plist
       properties:
         CFBundleDisplayName: 轻卡
+        CFBundleLocalizations: [zh-Hans, en]
         UILaunchScreen: {}
         NSHealthShareUsageDescription: 用于读取运动消耗与体重数据，计算每日能量收支
         NSHealthUpdateUsageDescription: 用于把体重与饮水记录写回健康
@@ -32,6 +33,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wangk123.lightcal
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
   LightCalTests:
     type: bundle.unit-test
     platform: iOS
