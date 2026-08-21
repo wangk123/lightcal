@@ -11,7 +11,8 @@ enum VisionFoodRecognizerError: Error, Equatable {
 /// 注意：iOS 26 SDK 已移除公开的 VNRecognizeFoodInSceneRequest，改用公开可用的
 /// VNClassifyImageRequest（通用图像分类，标签含大量食物类别；SDD 账本已记录该裁决）
 final class VisionFoodRecognizer: FoodPhotoRecognizing, @unchecked Sendable {
-    private static let labelMap: [String: String] = [
+    /// 公开给测试与内置库做覆盖校验：识别支持的食物中文名集合
+    static let labelMap: [String: String] = [
         // 主食/谷物
         "rice": "米饭", "fried rice": "炒饭", "risotto": "烩饭", "noodle": "面条", "spaghetti": "意大利面",
         "macaroni": "通心粉", "ramen": "拉面", "oatmeal": "燕麦", "cereal": "麦片", "congee": "粥", "porridge": "粥",

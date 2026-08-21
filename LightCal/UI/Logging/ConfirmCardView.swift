@@ -60,10 +60,18 @@ struct ConfirmCardView: View {
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .frame(width: 70)
-                            Text("\(Formatting.kcalText(item.nutrition.kcal)) kcal")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .monospacedDigit()
+                            VStack(alignment: .trailing, spacing: 2) {
+                                // 营养随份量实时换算（按每100g成分 × 当前克重）
+                                let factor = item.grams > 0 ? grams[index] / item.grams : 1
+                                Text("\(Formatting.kcalText(item.nutrition.kcal * factor)) kcal")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                                Text("蛋白 \(Formatting.gramsText(item.nutrition.protein * factor)) · 脂肪 \(Formatting.gramsText(item.nutrition.fat * factor)) · 碳水 \(Formatting.gramsText(item.nutrition.carb * factor))")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                    .monospacedDigit()
+                            }
                         }
                         .accessibilityIdentifier("confirmItem\(index)")
                     }
