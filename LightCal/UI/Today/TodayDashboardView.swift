@@ -14,7 +14,7 @@ struct TodayDashboardView: View {
                 Section { calorieCard }
                 Section { waterCard }
                 if !viewModel.suggestions.isEmpty {
-                    Section { suggestionContent }
+                    Section("缺口建议") { suggestionContent }
                 }
                 Section { predictionCard }
                 Section("今日记录") { timelineSection }
