@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftData
 
 @MainActor
 @Observable
@@ -18,6 +19,7 @@ final class TodayViewModel {
     private(set) var weightRate: Double?
     private(set) var energyRate: Double?
     private(set) var hasPresets = false
+    private(set) var timeline: [TimelineEntry] = []
 
     init(store: DataStore, database: FoodDatabase, healthKit: HealthKitServing, pipeline: LoggingPipelining) {
         self.store = store
@@ -102,6 +104,11 @@ final class TodayViewModel {
             targetKcal: targets.kcal,
             avgDailyExpenditureLast7d: avgExpenditure
         )
+
+        let foods = (try? store.logItems(on: now)) ?? []
+        let waters = (try? store.waterItems(on: now)) ?? []
+        timeline = (foods.map(TimelineEntry.food) + waters.map(TimelineEntry.water))
+            .sorted { $0.createdAt < $1.createdAt }
     }
 
     private static func bmrForCurrentProfile(store: DataStore) -> Double {
@@ -126,5 +133,67 @@ final class TodayViewModel {
         guard !toSave.isEmpty else { return }
         try? store.saveLogItems(toSave, date: .now, meal: selectedMeal)
         self.draft = nil
+    }
+
+    func delete(entry: TimelineEntry) async {
+        switch entry {
+        case .food(let item): try? store.deleteLogItem(item)
+        case .water(let item): try? store.deleteWaterItem(item)
+        }
+        await refresh()
+    }
+}
+
+/// 今日记录时间线条目：食物与饮水统一建模（spec 2026-08-21 §3.2）
+enum TimelineEntry: Identifiable {
+    case food(FoodLogItem)
+    case water(WaterLogItem)
+
+    var id: PersistentIdentifier {
+        switch self {
+        case .food(let item): item.persistentModelID
+        case .water(let item): item.persistentModelID
+        }
+    }
+
+    var createdAt: Date {
+        switch self {
+        case .food(let item): item.createdAt
+        case .water(let item): item.createdAt
+        }
+    }
+
+    /// 行首胶囊标签：食物=餐次，饮水="饮水"
+    var meal: String {
+        switch self {
+        case .food(let item): item.meal
+        case .water: "饮水"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .food(let item): FoodIcon.symbol(for: item.name)
+        case .water: "drop.fill"
+        }
+    }
+
+    /// 主体文案：食物="鸡胸肉 100g"，饮水="250 ml"
+    var titleText: String {
+        switch self {
+        case .food(let item): "\(item.name) \(Formatting.gramsText(item.grams))"
+        case .water(let item): "\(Formatting.mlText(item.amountMl)) ml"
+        }
+    }
+
+    var isAIEstimated: Bool {
+        if case .food(let item) = self { return item.source == NutritionSource.aiEstimated.rawValue }
+        return false
+    }
+
+    /// 行尾热量文案；饮水无热量返回 nil
+    var kcalText: String? {
+        if case .food(let item) = self { return Formatting.kcalText(item.nutrition.kcal) }
+        return nil
     }
 }

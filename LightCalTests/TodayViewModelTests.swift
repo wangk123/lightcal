@@ -90,4 +90,71 @@ final class TodayViewModelTests: XCTestCase {
         XCTAssertFalse(vm.suggestions.isEmpty)
         XCTAssertTrue(vm.suggestions.allSatisfy { $0.name == "牛奶" })
     }
+
+    func testTimelineMergesFoodAndWaterByCreatedAt() async throws {
+        let vm = try await makeViewModel()
+        vm.addWater(ml: 250)                       // 第一条：饮水
+        let item = CompletedFoodItem(name: "鸡胸肉", grams: 100, nutrition: NutritionFacts(kcal: 133, protein: 24.6, fat: 3.3, carb: 0.6), source: .builtin)
+        vm.draft = LogDraft(items: [item], originalText: nil)
+        vm.saveDraft()                             // 第二条：食物
+        vm.addWater(ml: 500)                       // 第三条：饮水
+        await vm.refresh()
+
+        XCTAssertEqual(vm.timeline.count, 3)
+        guard case .water(let w1) = vm.timeline[0],
+              case .food(let food) = vm.timeline[1],
+              case .water(let w2) = vm.timeline[2] else {
+            return XCTFail("时间线顺序应为：水250 → 食物 → 水500")
+        }
+        XCTAssertEqual(w1.amountMl, 250)
+        XCTAssertEqual(w2.amountMl, 500)
+        XCTAssertEqual(food.name, "鸡胸肉")
+    }
+
+    func testTimelineEntryDisplayProperties() async throws {
+        let vm = try await makeViewModel()
+        vm.addWater(ml: 250)
+        let item = CompletedFoodItem(name: "鸡胸肉", grams: 100, nutrition: NutritionFacts(kcal: 133, protein: 24.6, fat: 3.3, carb: 0.6), source: .builtin)
+        vm.draft = LogDraft(items: [item], originalText: nil)
+        vm.saveDraft()
+        await vm.refresh()
+
+        guard let waterEntry = vm.timeline.first, case .water = waterEntry else { return XCTFail("第一条应为饮水") }
+        XCTAssertEqual(waterEntry.titleText, "250 ml")
+        XCTAssertEqual(waterEntry.meal, "饮水")
+        XCTAssertEqual(waterEntry.icon, "drop.fill")
+        XCTAssertNil(waterEntry.kcalText)
+
+        guard let foodEntry = vm.timeline.last, case .food = foodEntry else { return XCTFail("最后一条应为食物") }
+        XCTAssertEqual(foodEntry.titleText, "鸡胸肉 100g")
+        XCTAssertEqual(foodEntry.kcalText, "133")
+        XCTAssertFalse(foodEntry.isAIEstimated)
+        XCTAssertEqual(foodEntry.icon, "fork.knife")
+    }
+
+    func testDeleteFoodAndWaterEntries() async throws {
+        let vm = try await makeViewModel()
+        let item = CompletedFoodItem(name: "鸡胸肉", grams: 100, nutrition: NutritionFacts(kcal: 133, protein: 24.6, fat: 3.3, carb: 0.6), source: .builtin)
+        vm.draft = LogDraft(items: [item], originalText: nil)
+        vm.saveDraft()
+        vm.addWater(ml: 250)
+        await vm.refresh()
+        XCTAssertEqual(vm.timeline.count, 2)
+
+        // 删饮水：时间线只剩食物，饮水汇总归零
+        if case .water = vm.timeline[1] {} else { return XCTFail("第二条应为饮水") }
+        await vm.delete(entry: vm.timeline[1])
+        XCTAssertEqual(vm.timeline.count, 1)
+        XCTAssertEqual(vm.summary.waterMl, 0, accuracy: 0.001)
+
+        // 删食物：时间线空，营养汇总归零
+        await vm.delete(entry: vm.timeline[0])
+        XCTAssertTrue(vm.timeline.isEmpty)
+        XCTAssertEqual(vm.summary.totalNutrition.kcal, 0, accuracy: 0.001)
+    }
+
+    func testEmptyTimeline() async throws {
+        let vm = try await makeViewModel()
+        XCTAssertTrue(vm.timeline.isEmpty)
+    }
 }
