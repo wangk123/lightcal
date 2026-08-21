@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct EntryPointSheet: View {
-    var onDraft: (LogDraft) -> Void
+    /// 保存回调：items 为勾选条目（含营养快照），meal 为用户选择的餐次
+    var onSave: ([CompletedFoodItem], MealKind) -> Void
     @Environment(\.dismiss) private var dismiss
 
     @State private var mode: EntryMode? = nil
@@ -9,33 +10,35 @@ struct EntryPointSheet: View {
     @State private var text = ""
     @State private var isParsing = false
     @State private var errorMessage: String?
+    /// 非 nil 时在同一个 NavigationStack 内切换到确认卡片（不触发新的 sheet 呈现，规避 SwiftUI 链式 sheet 竞态）
+    @State private var confirmDraft: LogDraft?
+    @State private var selectedMeal: MealKind = .lunch
 
     enum EntryMode { case photo, voice, text }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                if mode == nil {
-                    entryButtons
-                } else if mode == .text {
-                    textEntry
-                } else if mode == .voice {
-                    voiceEntry
-                }
-                if isParsing {
-                    ProgressView("处理中…")
-                }
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(DesignTokens.destructive)
+            Group {
+                if let draft = confirmDraft {
+                    ConfirmCardView(
+                        draft: draft,
+                        meal: $selectedMeal,
+                        onSave: { items in
+                            onSave(items, selectedMeal)
+                            dismiss()
+                        },
+                        onCancel: { dismiss() }
+                    )
+                } else {
+                    entryContent
                 }
             }
-            .padding()
-            .navigationTitle("添加食物")
+            .navigationTitle(confirmDraft == nil ? "添加食物" : "确认记录")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
+                if confirmDraft == nil {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("取消") { dismiss() }
+                    }
                 }
             }
         }
@@ -45,6 +48,27 @@ struct EntryPointSheet: View {
             }
             .ignoresSafeArea()
         }
+    }
+
+    private var entryContent: some View {
+        VStack(spacing: 16) {
+            if mode == nil {
+                entryButtons
+            } else if mode == .text {
+                textEntry
+            } else if mode == .voice {
+                voiceEntry
+            }
+            if isParsing {
+                ProgressView("处理中…")
+            }
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(DesignTokens.destructive)
+            }
+        }
+        .padding()
     }
 
     private var entryButtons: some View {
@@ -160,7 +184,8 @@ struct EntryPointSheet: View {
     }
 
     private func finish(with draft: LogDraft) {
-        dismiss()
-        onDraft(draft)
+        // 不关闭 sheet：在同一 NavigationStack 内切换为确认卡片，避免链式 sheet 呈现竞态
+        selectedMeal = draft.suggestedMeal ?? MealKind.suggested(for: .now)
+        confirmDraft = draft
     }
 }

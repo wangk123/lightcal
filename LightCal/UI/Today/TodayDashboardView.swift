@@ -3,7 +3,6 @@ import SwiftUI
 struct TodayDashboardView: View {
     @State private var viewModel: TodayViewModel
     @State private var showingEntry = false
-    @State private var showingConfirm = false
 
     init(viewModel: TodayViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -11,38 +10,26 @@ struct TodayDashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    calorieCard
-                    waterCard
-                    suggestionCard
-                    predictionCard
-                    timelineCard
+            List {
+                Section { calorieCard }
+                Section { waterCard }
+                if !viewModel.suggestions.isEmpty {
+                    Section { suggestionContent }
                 }
-                .padding()
+                Section { predictionCard }
+                Section("今日记录") { timelineSection }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
             .background(DesignTokens.background)
             .navigationTitle("今日")
             .task { await viewModel.refresh() }
             .sheet(isPresented: $showingEntry) {
-                EntryPointSheet { draft in
-                    viewModel.draft = draft
-                    // 解析出餐次则用之，否则按当前时间推荐（拍照识别自动对应早/午/晚/加餐）
-                    viewModel.selectedMeal = draft.suggestedMeal ?? MealKind.suggested(for: .now)
-                    showingConfirm = true
-                }
-            }
-            .sheet(isPresented: $showingConfirm) {
-                if let draft = viewModel.draft {
-                    ConfirmCardView(
-                        draft: draft,
-                        meal: $viewModel.selectedMeal,
-                        onSave: { items in
-                            viewModel.saveDraft(items: items)
-                            showingConfirm = false
-                            Task { await viewModel.refresh() }
-                        }
-                    )
+                EntryPointSheet { items, meal in
+                    viewModel.selectedMeal = meal
+                    viewModel.saveDraft(items: items)
+                    showingEntry = false
+                    Task { await viewModel.refresh() }
                 }
             }
             .toolbar {
@@ -73,9 +60,6 @@ struct TodayDashboardView: View {
             MacroProgressBar(label: "脂肪", current: viewModel.summary.totalNutrition.fat, target: viewModel.gap.fatGap + viewModel.summary.totalNutrition.fat, color: DesignTokens.accent)
             MacroProgressBar(label: "碳水", current: viewModel.summary.totalNutrition.carb, target: viewModel.gap.carbGap + viewModel.summary.totalNutrition.carb, color: Color(hex: 0x7C3AED))
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private var waterCard: some View {
@@ -95,30 +79,18 @@ struct TodayDashboardView: View {
                     .accessibilityIdentifier("waterQuick500")
             }
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private var suggestionCard: some View {
-        Group {
-            if !viewModel.suggestions.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("缺口建议").font(.subheadline).foregroundStyle(.secondary)
-                    ForEach(viewModel.suggestions, id: \.name) { suggestion in
-                        Text("\(suggestion.name) \(Formatting.gramsText(suggestion.grams)) · \(Formatting.kcalText(suggestion.nutrition.kcal)) kcal")
-                            .font(.callout)
-                    }
-                    if !viewModel.hasPresets {
-                        Text("建议来源于全部食物库。去「我的 → 预设食物」设置手边常备食材，建议更贴合实际")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+    private var suggestionContent: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(viewModel.suggestions, id: \.name) { suggestion in
+                Text("\(suggestion.name) \(Formatting.gramsText(suggestion.grams)) · \(Formatting.kcalText(suggestion.nutrition.kcal)) kcal")
+                    .font(.callout)
+            }
+            if !viewModel.hasPresets {
+                Text("建议来源于全部食物库。去「我的 → 预设食物」设置手边常备食材，建议更贴合实际")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
             }
         }
     }
@@ -138,52 +110,60 @@ struct TodayDashboardView: View {
                 Text("趋势计算中…").font(.callout).foregroundStyle(.secondary)
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private var timelineCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("今日记录").font(.subheadline).foregroundStyle(.secondary)
-            let items = (try? AppContainer.shared.store.logItems(on: .now)) ?? []
-            if items.isEmpty {
-                Text("还没有记录，点右上角 + 开始打卡").font(.callout).foregroundStyle(.secondary)
-            } else {
-                ForEach(items, id: \.persistentModelID) { item in
-                    HStack {
-                        Text(item.meal)
-                            .font(.caption)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(DesignTokens.primary.opacity(0.15))
-                            .clipShape(Capsule())
-                        Image(systemName: FoodIcon.symbol(for: item.name))
-                            .foregroundStyle(DesignTokens.primary)
-                            .frame(width: 24)
-                        Text("\(item.name) \(Formatting.gramsText(item.grams))")
-                            .font(.callout)
-                        if item.source == NutritionSource.aiEstimated.rawValue {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.caption)
-                                .foregroundStyle(DesignTokens.aiAmber)
-                                .accessibilityLabel("AI 估算")
+    @ViewBuilder
+    private var timelineSection: some View {
+        if viewModel.timeline.isEmpty {
+            Text("还没有记录，点右上角 + 开始打卡")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        } else {
+            ForEach(viewModel.timeline) { entry in
+                timelineRow(entry)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            Task { await viewModel.delete(entry: entry) }
+                        } label: {
+                            Label("删除", systemImage: "trash")
                         }
-                        Spacer()
-                        Text("\(Formatting.kcalText(item.nutrition.kcal)) kcal")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
                     }
-                    .padding(.vertical, 4)
-                }
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func timelineRow(_ entry: TimelineEntry) -> some View {
+        HStack {
+            Text(entry.meal)
+                .font(.caption)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(DesignTokens.primary.opacity(0.15))
+                .clipShape(Capsule())
+            Image(systemName: entry.icon)
+                .foregroundStyle(DesignTokens.primary)
+                .frame(width: 24)
+            Text(entry.titleText)
+                .font(.callout)
+            if entry.isAIEstimated {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(DesignTokens.aiAmber)
+                    .accessibilityLabel("AI 估算")
+            }
+            Spacer()
+            Text(Formatting.timeText(entry.createdAt))
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .monospacedDigit()
+            if let kcalText = entry.kcalText {
+                Text("\(kcalText) kcal")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
