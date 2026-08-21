@@ -656,13 +656,13 @@ git commit -m "feat: Formatting.timeText（HH:mm 时间显示）"
         vm.saveDraft()
         await vm.refresh()
 
-        guard case .water(let waterEntry) = vm.timeline.first else { return XCTFail("第一条应为饮水") }
+        guard let waterEntry = vm.timeline.first, case .water = waterEntry else { return XCTFail("第一条应为饮水") }
         XCTAssertEqual(waterEntry.titleText, "250 ml")
         XCTAssertEqual(waterEntry.meal, "饮水")
         XCTAssertEqual(waterEntry.icon, "drop.fill")
         XCTAssertNil(waterEntry.kcalText)
 
-        guard case .food(let foodEntry) = vm.timeline.last else { return XCTFail("最后一条应为食物") }
+        guard let foodEntry = vm.timeline.last, case .food = foodEntry else { return XCTFail("最后一条应为食物") }
         XCTAssertEqual(foodEntry.titleText, "鸡胸肉 100g")
         XCTAssertEqual(foodEntry.kcalText, "133")
         XCTAssertFalse(foodEntry.isAIEstimated)
