@@ -37,6 +37,25 @@ final class DataStoreTests: XCTestCase {
         XCTAssertEqual(summary.waterMl, 750, accuracy: 0.001)
     }
 
+    func testWaterItemsSortedByCreatedAt() throws {
+        let store = try makeStore()
+        try store.addWater(ml: 250, date: day())
+        try store.addWater(ml: 500, date: day())
+        let items = try store.waterItems(on: day())
+        XCTAssertEqual(items.map(\.amountMl), [250, 500])
+    }
+
+    func testDeleteWaterItem() throws {
+        let store = try makeStore()
+        try store.addWater(ml: 250, date: day())
+        let items = try store.waterItems(on: day())
+        XCTAssertEqual(items.count, 1)
+        try store.deleteWaterItem(items[0])
+        XCTAssertTrue(try store.waterItems(on: day()).isEmpty)
+        // 删除后日汇总联动归零
+        XCTAssertEqual(try store.daySummary(day()).waterMl, 0, accuracy: 0.001)
+    }
+
     func testGoalVersioningKeepsHistory() throws {
         let store = try makeStore()
         let g1 = Goal(targetWeightKg: 65, startDate: .now, startWeightKg: 70, targets: DailyTargets(kcal: 1800, protein: 126, fat: 56, carb: 200), systemTargets: DailyTargets(kcal: 1800, protein: 126, fat: 56, carb: 200), waterTargetMl: 2100)

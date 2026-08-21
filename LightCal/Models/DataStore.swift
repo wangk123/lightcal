@@ -110,8 +110,14 @@ final class DataStore {
         let start = Calendar.current.startOfDay(for: day)
         let end = Calendar.current.date(byAdding: .day, value: 1, to: start)!
         return try container.mainContext.fetch(FetchDescriptor<WaterLogItem>(
-            predicate: #Predicate { $0.date >= start && $0.date < end }
+            predicate: #Predicate { $0.date >= start && $0.date < end },
+            sortBy: [SortDescriptor(\.createdAt)]
         ))
+    }
+
+    func deleteWaterItem(_ item: WaterLogItem) throws {
+        container.mainContext.delete(item)
+        try container.mainContext.save()
     }
 
     // MARK: - 每日聚合（派生数据，不落库 spec 3.8）
