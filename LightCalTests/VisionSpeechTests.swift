@@ -6,6 +6,10 @@ final class VisionSpeechTests: XCTestCase {
         XCTAssertEqual(VisionFoodRecognizer.localizedName("Rice"), "米饭")
         XCTAssertEqual(VisionFoodRecognizer.localizedName("chicken"), "鸡肉")
         XCTAssertEqual(VisionFoodRecognizer.localizedName("sweet potato"), "红薯")
+        XCTAssertEqual(VisionFoodRecognizer.localizedName("steak"), "牛排")
+        XCTAssertEqual(VisionFoodRecognizer.localizedName("fried rice"), "炒饭")
+        XCTAssertEqual(VisionFoodRecognizer.localizedName("watermelon"), "西瓜")
+        XCTAssertEqual(VisionFoodRecognizer.localizedName("dumpling"), "饺子")
         XCTAssertEqual(VisionFoodRecognizer.localizedName("SomeUnknownThing"), "SomeUnknownThing")
     }
 

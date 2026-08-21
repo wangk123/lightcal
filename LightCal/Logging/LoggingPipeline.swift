@@ -8,6 +8,7 @@ protocol FoodPhotoRecognizing: Sendable {
 struct LogDraft: Equatable, Sendable {
     var items: [CompletedFoodItem]
     var originalText: String?
+    var suggestedMeal: MealKind? = nil   // 解析出的餐次；无则 UI 按当前时间推荐
 }
 
 enum LoggingPipelineError: Error, Equatable {
@@ -51,7 +52,8 @@ final class LoggingPipeline: LoggingPipelining {
                 ?? [ParsedFoodItem(name: trimmed, grams: nil, count: nil, unit: nil, meal: nil)]
         }
         let items = await completion.complete(parsed)
-        return LogDraft(items: items, originalText: trimmed)
+        let meal = parsed.first(where: { $0.meal != nil })?.meal
+        return LogDraft(items: items, originalText: trimmed, suggestedMeal: meal)
     }
 
     func process(photoData: Data) async throws -> LogDraft {
@@ -62,6 +64,6 @@ final class LoggingPipeline: LoggingPipelining {
             throw LoggingPipelineError.photoRecognitionFailed  // UI 降级为文字录入
         }
         let items = await completion.complete(parsed)
-        return LogDraft(items: items, originalText: nil)
+        return LogDraft(items: items, originalText: nil, suggestedMeal: nil)
     }
 }

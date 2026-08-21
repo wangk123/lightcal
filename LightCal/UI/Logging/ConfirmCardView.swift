@@ -29,6 +29,9 @@ struct ConfirmCardView: View {
                 Section("确认食物（可修改份量）") {
                     ForEach(Array(draft.items.enumerated()), id: \.offset) { index, item in
                         HStack {
+                            Image(systemName: FoodIcon.symbol(for: item.name))
+                                .foregroundStyle(DesignTokens.primary)
+                                .frame(width: 28)
                             Text(item.name)
                             if item.source == .aiEstimated {
                                 Image(systemName: "exclamationmark.triangle.fill")

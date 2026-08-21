@@ -27,6 +27,8 @@ struct TodayDashboardView: View {
             .sheet(isPresented: $showingEntry) {
                 EntryPointSheet { draft in
                     viewModel.draft = draft
+                    // 解析出餐次则用之，否则按当前时间推荐（拍照识别自动对应早/午/晚/加餐）
+                    viewModel.selectedMeal = draft.suggestedMeal ?? MealKind.suggested(for: .now)
                     showingConfirm = true
                 }
             }
@@ -152,6 +154,9 @@ struct TodayDashboardView: View {
                             .padding(.vertical, 2)
                             .background(DesignTokens.primary.opacity(0.15))
                             .clipShape(Capsule())
+                        Image(systemName: FoodIcon.symbol(for: item.name))
+                            .foregroundStyle(DesignTokens.primary)
+                            .frame(width: 24)
                         Text("\(item.name) \(Formatting.gramsText(item.grams))")
                             .font(.callout)
                         if item.source == NutritionSource.aiEstimated.rawValue {

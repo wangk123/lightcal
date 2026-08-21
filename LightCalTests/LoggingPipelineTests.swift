@@ -52,6 +52,19 @@ final class LoggingPipelineTests: XCTestCase {
         let draft = try await pipeline.process(text: "100g鸡胸肉")
         XCTAssertEqual(draft.items, completed)
         XCTAssertEqual(draft.originalText, "100g鸡胸肉")
+        XCTAssertEqual(draft.suggestedMeal, .lunch)  // 解析出的餐次透传
+    }
+
+    func testPhotoPathHasNoSuggestedMeal() async throws {
+        let imageData = Data([0xFF, 0xD8])
+        let parsed = self.parsed
+        let completed = self.completed
+        let pipeline = makePipeline(
+            photo: { _ in parsed },
+            completion: { _ in completed }
+        )
+        let draft = try await pipeline.process(photoData: imageData)
+        XCTAssertNil(draft.suggestedMeal)  // 拍照无餐次信息，由 UI 按时间推荐
     }
 
     func testTextParserFailureFallsBackToFallbackParser() async throws {
